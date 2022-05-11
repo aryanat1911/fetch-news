@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+
+    <title>Fetch News</title>
+
+
+</head>
+
+<body>
+
+    <nav id="navbar-section">
+        <ul>
+            <li class="news-filter" data-filter="Mumbai">Mumbai</li>
+            <li class="news-filter" data-filter="Kolkata">Kolkata</li>
+            <li class="news-filter" data-filter="Delhi">Delhi</li>
+            <li class="news-filter" data-filter="Lucknow">Lucknow</li>
+            <li class="news-filter" data-filter="Gujarat">Gujarat</li>
+        </ul>
+    </nav>
+
+    <form id="news-form" name="Form">
+        <div class="black-filter">
+            <input id="search-news" type="text" placeholder="Type here to search news">
+            <input id="search-btn" type="submit" value="Search">
+        </div>
+    </form>
+
+    <div class="news-wrapper">
+        <ul id="news-list">
+        </ul>
+    </div>
+    <script>
+        (function () {
+            function fetchNews(query) {
+                var apiURL = "https://api.newscatcherapi.com/v2/search?q=" + query;
+
+                const xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var response = (JSON.parse(this.responseText));
+                        updateUI(response);
+                        console.log(response)
+                    }
+                };
+
+                xhttp.open("GET", apiURL);
+                xhttp.setRequestHeader("x-api-key", "fJyiESuGBZwwnz-1btPCJNeoUn_0_co8dlJeiGNdQlk");
+                xhttp.send();
+            }
+
+            function updateUI(response) {
+                clearList();
+                var ul = document.querySelector("#news-list");
+
+                for (i = 0; i < response.articles.length; i++) {
+                    var li = document.createElement('li');
+                    var div = document.createElement('div');
+                    var a = document.createElement('a');
+                    div.classList.add('news-card');
+
+                    var h1 = document.createElement('h1');
+                    var h4 = document.createElement('h4');
+
+                    h1.innerText = response.articles[i].title;
+                    h4.innerText = response.articles[i].excerpt;
+
+                    a.appendChild(h1)
+                    a.href = response.articles[i].link
+                    a.target = "_blank"
+
+                    div.appendChild(a);
+                    div.appendChild(h4);
+
+                    li.appendChild(div);
+                    ul.appendChild(li);
+
+                }
+            }
+
+            function clearList() {
+                var ul = document.querySelector("#news-list");
+                ul.innerHTML = "";
+            }
+
+            function formSubmitted(e) {
+                e.preventDefault();
+                var searchBox = document.querySelector('#search-news')
+                fetchNews(searchBox.value);
+            }
+
+            var form = document.querySelector("#news-form");
+            form.addEventListener("submit", formSubmitted);
+
+
+            var newsFilters = document.querySelectorAll(".news-filter");
+            newsFilters.forEach(function (filter) {
+                filter.addEventListener('click', function (e) {
+                    fetchNews(e.target.dataset.filter);
+                });
+            })
+
+
+        })();
+    </script>
+</body>
+
+</html>
